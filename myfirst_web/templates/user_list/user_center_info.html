@@ -29,7 +29,7 @@
 					<span>|</span>
 					<a href="{% url 'user:user_center_info' %}">用户中心</a>
 					<span>|</span>
-					<a href="{% url 'user:cart' %}">我的购物车</a>
+					<a href="{% url 'cart:show_cart' %}">我的购物车</a>
 					<span>|</span>
 					<a href="{% url 'user:user_center_order' %}">我的订单</a>
 				</div>
@@ -38,7 +38,7 @@
 	</div>
 
 	<div class="search_bar clearfix">
-		<a href="{% url 'user:index' %}" class="logo fl"><img src="{% static 'images/logo.png' %}"></a>
+		<a href="{% url 'goods:index' %}" class="logo fl"><img src="{% static 'images/logo1.png' %}"></a>
 		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
 		<div class="search_con fr">
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
@@ -61,7 +61,7 @@
 				<h3 class="common_title2">基本信息</h3>
 						<ul class="user_info_list">
                             {% if user.is_authenticated %}
-                                <li><span>用户名：</span>{{ user.username }}<input type="submit" value="添加信息" name=""></li>
+                                <li><span>用户名：</span>{{ user.username }}</li>
                                 {% if  user_check  == 1 %}
                                     <li><span>联系方式：</span>{{ user_phone }}</li>
                                     <li><span>联系地址：</span>{{ user_address }}</li>
@@ -71,62 +71,27 @@
                                 {% endif %}
                         {% endif %}
 						</ul>
+                        <span>
+                            <input type="submit" value="添加信息" name="">
+                        </span>
 				</div>
                 </form>
 				<h3 class="common_title2">最近浏览</h3>
 				<div class="has_view_list">
 					<ul class="goods_type_list clearfix">
-				<li>
-					<a href="detail.html"><img src="{% static 'images/goods/goods003.jpg' %}"></a>
-					<h4><a href="detail.html">大兴大棚草莓</a></h4>
-					<div class="operate">
-						<span class="prize">￥16.80</span>
-						<span class="unit">16.80/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="{% static 'images/goods/goods004.jpg' %}"></a>
-					<h4><a href="#">吐鲁番梨光杏</a></h4>
-					<div class="operate">
-						<span class="prize">￥5.50</span>
-						<span class="unit">5.50/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="{% static 'images/goods/goods005.jpg' %}"></a>
-					<h4><a href="#">黄肉桃</a></h4>
-					<div class="operate">
-						<span class="prize">￥10.00</span>
-						<span class="unit">10.00/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="{% static 'images/goods/goods006.jpg' %}"></a>
-					<h4><a href="#">进口西梅</a></h4>
-					<div class="operate">
-						<span class="prize">￥28.80</span>
-						<span class="unit">28.8/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-
-				<li>
-					<a href="#"><img src="{% static 'images/goods/goods007.jpg' %}"></a>
-					<h4><a href="#">香梨</a></h4>
-					<div class="operate">
-						<span class="prize">￥6.45</span>
-						<span class="unit">6.45/500g</span>
-						<a href="#" class="add_goods" title="加入购物车"></a>
-					</div>
-				</li>
-			</ul>
-		</div>
+                        {% for sku in sku_list %}
+                        <li>
+                            <a href="{% url 'goods:detail' %}?id={{ sku.id }}"><img src="{{ sku.image.url }}"></a>
+                            <h4><a href="{% url 'goods:detail' %}?id={{ sku.id }}">{{ sku.name }}</a></h4>
+                            <div class="operate">
+                                <span class="prize">￥{{ sku.price }}</span>
+                                <span class="unit">{{ sku.price }}/{{ sku.unite }}</span>
+                                <a href="{% url 'goods:cart' %}" class="add_goods" title="加入购物车"></a>
+                            </div>
+                        </li>
+                        {% endfor %}
+			        </ul>
+		        </div>
 		</div>
 	</div>
 

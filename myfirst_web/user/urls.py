@@ -15,11 +15,10 @@ Including another URLconf
 """
 from django.conf.urls import include, url
 from django.contrib import admin
-from . import views
+from user import views
 from django.contrib.auth.decorators import login_required
 
 urlpatterns = [
-    url(r'^index$',views.index,name="index"),
     url(r'^login$',views.userlogin,name="login"),
     url(r'^handle$',views.handle,name="handle"),
     url(r'^logout$', views.userlogout, name="logout"),
@@ -30,7 +29,6 @@ urlpatterns = [
     url(r'^register_handle$',views.register_handle,name="register_handle"),
     url(r'^validatecode$',views.validatecode,name="validatecode"),
     url(r'^user_center_info$',login_required(views.user_center_info),name="user_center_info"),
-    url(r'^cart$',views.cart,name="cart"),
     url(r'^user_center_order$',login_required(views.user_center_order),name="user_center_order"),
     url(r'^user_center_site$',login_required(views.user_center_site),name="user_center_site"),
     url(r'^province/$', views.province),

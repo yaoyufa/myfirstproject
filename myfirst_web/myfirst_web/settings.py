@@ -40,6 +40,9 @@ INSTALLED_APPS = (
     "user",
     "goods",
     "tinymce",
+    'haystack',
+    "cart",
+    "order"
 )
 
 MIDDLEWARE_CLASSES = (
@@ -143,4 +146,19 @@ DEFAULT_FILE_STORAGE='util.fdfs.storage_util.FDFSStorage'
 
 FDFS_CLIENT_CONF='util/fdfs/client.conf'
 
-FDFS_URL='http://192.168.12.196:8888'
+FDFS_URL='http://192.168.12.196:8888/'
+
+
+HAYSTACK_CONNECTIONS = {
+    'default': {
+        #使用whoosh引擎
+        'ENGINE': 'haystack.backends.whoosh_cn_backend.WhooshEngine',
+        #索引文件路径
+        'PATH': os.path.join(BASE_DIR, 'whoosh_index'),
+    }
+}
+
+HAYSTACK_SIGNAL_PROCESSOR = 'haystack.signals.RealtimeSignalProcessor'
+
+from redis import  StrictRedis
+REDIS_CONN = StrictRedis('192.168.12.196')

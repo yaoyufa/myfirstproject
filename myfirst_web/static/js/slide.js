@@ -46,7 +46,7 @@ $(function(){
 		{
 			return;
 		}
-		
+
 		$(this).addClass('active').siblings().removeClass('active');
 		move();
 
@@ -56,18 +56,18 @@ $(function(){
 		if(ismove)
 		{
 			return;
-		}		
+		}
 		nowli--;
 		move();
 		$points.eq(nowli).addClass('active').siblings().removeClass('active');
 
 	});
-	
+
 	$next.click(function() {
 		if(ismove)
 		{
 			return;
-		}		
+		}
 		nowli++;
 		move();
 		$points.eq(nowli).addClass('active').siblings().removeClass('active');
@@ -108,22 +108,22 @@ $(function(){
 
 		if(prevli<nowli)
 		{
-			$slides.eq(nowli).css({left:760});			
+			$slides.eq(nowli).css({left:760});
 			$slides.eq(prevli).animate({left:-760},800,'easeOutExpo');
 			$slides.eq(nowli).animate({left:0},800,'easeOutExpo',function(){
 				ismove = false;
 			});
 			prevli=nowli;
-			
+
 		}
 		else
-		{			
-			$slides.eq(nowli).css({left:-760});			
-			$slides.eq(prevli).animate({left:760},800,'easeOutExpo');	
+		{
+			$slides.eq(nowli).css({left:-760});
+			$slides.eq(prevli).animate({left:760},800,'easeOutExpo');
 			$slides.eq(nowli).animate({left:0},800,'easeOutExpo',function(){
 				ismove = false;
 			});
-			prevli=nowli;		
+			prevli=nowli;
 		}
 
 	}

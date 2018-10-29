@@ -247,6 +247,7 @@ html,body{height:100%}
 .goods_num{height:52px;margin-top:19px;}
 .goods_num .num_name{width:70px;height:52px;line-height:52px;}
 .goods_num .num_add{width:75px;height:50px;border:1px solid #dddddd}
+.goods_num .other_size{width: 500px;height: 52px;margin-left: 200px}
 .goods_num .num_add input{width:49px;height:50px;text-align:center;line-height:50px;border:0px;outline:none;font-size:14px;color:#666}
 .goods_num .num_add .add,.goods_num .num_add .minus{width:25px;line-height:25px;text-align:center;border-left:1px solid #ddd;border-bottom:1px solid #ddd;color:#666;font-size:14px}
 .goods_num .num_add .minus{border-bottom:0px}
@@ -272,6 +273,9 @@ html,body{height:100%}
 .tab_content dt{margin-top:10px;font-size:16px;color:#044d39}
 .tab_content dd{line-height:24px;margin-top:5px;}
 
+#show {display: none}
+
+.show {margin-left: 15px;}
 
 /* 登录页 */
 

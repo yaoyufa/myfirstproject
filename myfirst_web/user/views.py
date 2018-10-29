@@ -1,24 +1,20 @@
-from django.shortcuts import render
+from django.shortcuts import render,redirect
 from django.http import HttpResponse,HttpResponseRedirect,JsonResponse
 from user.models import *
 from django.contrib.auth import authenticate, login
-from django.views.generic import View
 from encrypt.md5 import my_md5
 from django.core.urlresolvers import reverse
-from encrypt import my_login
 import random
 from PIL import Image, ImageDraw, ImageFont
-from datetime import datetime
 from io import BytesIO
 from itsdangerous import TimedJSONWebSignatureSerializer as Serializer,SignatureExpired,BadSignature
 from celery_tasks.task import task_celery_tasks
 from myfirst_web import settings
 from redis import StrictRedis
 from django.contrib.auth import logout
+from goods.models import *
+from order.models import *
 
-
-def index(request):
-    return render(request,'user_list/index.html')
 def userlogin(request):
     if request.method == "GET":
         a=reverse('user:login')
@@ -38,12 +34,12 @@ def userlogin(request):
             else:
                 if user.is_active:
                     login(request,user)
-                    request.session["now_login_username"] = user_name
+                    # request.session["now_login_username"] = user_name
                     next_url=request.GET.get('next')
                     if next_url:
                         return HttpResponseRedirect(next_url)
                     else:
-                        resp = HttpResponse("OK")
+                        resp = redirect(reverse('goods:index'))
                         if remember_name == "1":
                             resp.set_cookie("remember_user_name", user_name, 3600 * 24 * 7)
                         else:
@@ -52,12 +48,6 @@ def userlogin(request):
                 else:
                     return HttpResponse('0')
         else:
-            # url_dest = request.COOKIES.get("url_dest")
-            # if url_dest:
-            #     resp = HttpResponseRedirect(url_dest)
-            #     resp.delete_cookie("url_dest")
-            # else:
-            #     resp = HttpResponseRedirect(reverse("area:index"))
             return render(request,"user_list/login.html",{"login_error":1})
 def register(request):
     return render(request,"user_list/register.html")
@@ -135,26 +125,41 @@ def validatecode(request):
     im.save(buf, 'png')
     return HttpResponse(buf.getvalue(), 'image/png')
 def user_center_info(request):
-    if request.session['now_login_username']:
-        user=User.objects.filter(username=request.session['now_login_username'])[0]
-        user_address=user.user_address
-        user_phone=user.user_phone
-        if user_phone:
-            if user_address:
-                user_check = 1
-        else:
-            user_check = 0
-        return render(request,'user_list/user_center_info.html',{"user_address":user_address,"user_phone":user_phone,"user_check":user_check})
-    else:
-        return render(request,'user_list/login.html')
+    user=request.user
+    if user.is_authenticated():
+        # if request.session['now_login_username']:
+        #     user=User.objects.filter(username=request.session['now_login_username'])[0]
+            user_address=user.user_address
+            user_phone=user.user_phone
+            comm=StrictRedis('192.168.12.196')
+            sku_list=[]
+            history = comm.lrange('histort_%d'%user.id,0,-1)
+            for id in history:
+                sku=GoodsSKU.objects.filter(id=id)[0]
+                sku_list.append(sku)
+            if user_phone:
+                if user_address:
+                    user_check = 1
+            else:
+                user_check = 0
+            return render(request,'user_list/user_center_info.html',{"user_address":user_address,"user_phone":user_phone,"user_check":user_check,"sku_list":sku_list})
+        # else:
+        #     return render(request,'user_list/login.html')
 def user_center_order(request):
-    return render(request,'user_list/user_center_order.html')
-def cart(request):
-    return render(request,'user_list/cart.html')
+    user =request.user
+    order_info=OrderInfo.objects.filter(user_id=user.id)
+    for order in order_info:
+        order_goods=OrderGoods.objects.filter(order_id=order.order_id)
+        order.goods=order_goods
+        for i in order_goods:
+            i.amount=i.count*i.price
+    ret={
+        "order_info":order_info,
+    }
+    return render(request,'user_list/user_center_order.html',ret)
 def user_center_site(request):
+    user = request.user
     if request.method == 'GET':
-        ret = request.session['now_login_username']
-        user = User.objects.filter(username=ret)[0]
         a_username_id = user.id
         address=Address.objects.filter(a_username_id=a_username_id)
         address_list=[]
@@ -187,8 +192,6 @@ def user_center_site(request):
                 address_list.append(i)
             return render(request, 'user_list/user_center_site.html',{"address_list":address_list})
     elif request.method == 'POST':
-        ret = request.session['now_login_username']
-        user = User.objects.filter(username=ret)[0]
         user_recipient = request.POST.get('user_recipient')
         province_id=request.POST.get('province')
         user_province=AreaInfo.objects.filter(id=province_id)[0].atitle
@@ -223,11 +226,10 @@ def forget(request):
     else:
             return render(request,"user_list/forget.html")
 def add_info(request):
+    user=request.user
     if request.method == 'POST':
         user_address=request.POST.get('user_address')
         user_phone=request.POST.get('user_phone')
-        ret=request.session['now_login_username']
-        user=User.objects.filter(username=ret)[0]
         user.user_phone=user_phone
         user.user_address=user_address
         user.save()
@@ -237,7 +239,7 @@ def add_info(request):
         return render(request, 'user_list/add_info.html')
 def userlogout(request):
         logout(request)
-        return HttpResponseRedirect(reverse('user:index'))
+        return HttpResponseRedirect(reverse('goods:index'))
 def handle(request):
     if request.method == 'POST':
         address_id = request.POST.get('id')

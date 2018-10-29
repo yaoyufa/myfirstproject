@@ -28,7 +28,7 @@
 					<span>|</span>
 					<a href="{% url 'user:user_center_info' %}">用户中心</a>
 					<span>|</span>
-					<a href="{% url 'user:cart' %}">我的购物车</a>
+					<a href="{% url 'cart:show_cart' %}">我的购物车</a>
 					<span>|</span>
 					<a href="{% url 'user:user_center_order' %}">我的订单</a>
 				</div>
@@ -36,7 +36,7 @@
 		</div>
 	</div>
 	<div class="search_bar clearfix">
-		<a href="{% url 'user:index' %}" class="logo fl"><img src="{% static 'images/logo.png' %}"></a>
+		<a href="{% url 'goods:index' %}" class="logo fl"><img src="{% static 'images/logo1.png' %}"></a>
 		<div class="sub_page_name fl">|&nbsp;&nbsp;&nbsp;&nbsp;用户中心</div>
 		<div class="search_con fr">
 			<input type="text" class="input_text fl" name="" placeholder="搜索商品">

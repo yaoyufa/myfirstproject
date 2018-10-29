@@ -1,0 +1,275 @@
+{% load static from staticfiles %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html;charset=UTF-8">
+	<title>天天生鲜-用户中心</title>
+	<link rel="stylesheet" type="text/css" href="{% static 'css/reset.css' %}">
+	<link rel="stylesheet" type="text/css" href="{% static 'css/main.css' %}">
+</head>
+<body>
+	<div class="header_con">
+		<div class="header">
+			<div class="welcome fl">欢迎来到天天生鲜!</div>
+			<div class="fr">
+                {% if user.is_authenticated %}
+                    <div class="login_info fl">
+                        欢迎您：<em>{{ user.username }}</em>
+                        <span>|</span>
+                        <a href="{% url 'user:logout'%}">退出</a>
+                    </div>
+                {% else %}
+                    <div class="login_btn fl">
+                        <a href="{% url 'user:login' %}">登录</a>
+                        <span>|</span>
+                        <a href="{% url 'user:register' %}">注册</a>
+                    </div>
+                {% endif %}
+				<div class="user_link fl">
+					<span>|</span>
+					<a href="{% url 'user:user_center_info' %}">用户中心</a>
+					<span>|</span>
+					<a href="{% url 'cart:show_cart' %}">我的购物车</a>
+					<span>|</span>
+					<a href="{% url 'user:user_center_order' %}">我的订单</a>
+				</div>
+			</div>
+		</div>
+	</div>
+
+	<div class="search_bar clearfix">
+		<a href="{% url 'goods:index' %}" class="logo fl"><img src="{% static 'images/logo1.png' %}"></a>
+		<div class="search_con fl">
+			<input type="text" class="input_text fl" name="" placeholder="搜索商品">
+			<input type="button" class="input_btn fr" name="" value="搜索">
+		</div>
+		<div class="guest_cart fr">
+			<a href="{% url 'goods:cart' %}" class="cart_name fl">我的购物车</a>
+			<div class="goods_count fl" id="show_count"></div>
+		</div>
+	</div>
+
+	<div class="navbar_con">
+		<div class="navbar clearfix">
+			<div class="subnav_con fl">
+				<h1>全部商品分类</h1>
+				<span></span>
+				<ul class="subnav">
+                    {% for types in goods_list %}
+			            <li><a href="{% url 'goods:list' %}?type={{ type.id }}&pn=1&sort=default" class="{{ types.logo }}">{{ types.name }}</a></li>
+                    {% endfor %}
+				</ul>
+			</div>
+			<ul class="navlist fl">
+				<li><a href="{% url 'goods:index' %}">首页</a></li>
+				<li class="interval">|</li>
+				<li><a href="">手机生鲜</a></li>
+				<li class="interval">|</li>
+				<li><a href="">抽奖</a></li>
+			</ul>
+		</div>
+	</div>
+
+	<div class="breadcrumb">
+		<a href="#">全部分类</a>
+		<span>></span>
+		<a href="">{{ type.name }}</a>
+		<span>></span>
+		<a href="#">商品详情</a>
+	</div>
+
+	<div class="goods_detail_con clearfix">
+		<div class="goods_detail_pic fl"><img src="{{ goods_image.image.url }}" width="350" height="350"></div>
+
+		<div class="goods_detail_list fr">
+			<h3>{{ sku.name }}</h3>
+			<p>{{ sku.decs }}</p>
+			<div class="prize_bar">
+				<span class="show_pirze">¥<em id="show_pirze">{{ sku.price }}</em></span>
+				<span class="show_unit">单  位：{{ sku.unite }}</span>
+			</div>
+			<div class="goods_num clearfix">
+				<div class="num_name fl">数 量：</div>
+                    <div class="num_add fl">
+                        <input type="text" id='text_box' class="num_show fl" value="1">
+                        <a href="javascript:;" id="add" class="add fr">+</a>
+                        <a href="javascript:;" id="min" class="minus fr">-</a>
+                    </div>
+                    <div class="other_size">
+                        <span>其他规格：</span>
+                        <ul>
+                        <div>
+                            {% for i in same_spu_skus %}
+                                <a href="{% url 'goods:detail' %}?id={{ i.id }}">{{ i.name }}</a>
+                            {% endfor %}
+                        </div>
+                        </ul>
+                    </div>
+			</div>
+			<div class="total">总价：<em id="gtotal">{{ sku.price }}</em></div>
+			<div class="operate_btn">
+				<a href="javascript:;" class="buy_btn">立即购买</a>
+				<a href="javascript:;" class="add_cart" id="add_cart" sku_id="{{ sku.id }}">加入购物车</a>
+			</div>
+		</div>
+	</div>
+
+	<div class="main_wrap clearfix">
+		<div class="l_wrap fl clearfix">
+			<div class="new_goods">
+				<h3>新品推荐</h3>
+				<ul>
+                    {% for i in new_skus %}
+					<li>
+						<a href="{% url 'goods:detail' %}?id={{ i.id }}"><img src="{{ i.image.url }} "></a>
+						<h4><a href="{% url 'goods:detail' %}?id={{ i.id }}">{{ i.name }}</a></h4>
+						<div class="prize">￥{{ i.price }}</div>
+					</li>
+                    {% endfor %}
+				</ul>
+			</div>
+		</div>
+
+		<div class="r_wrap fr clearfix">
+			<ul class="detail_tab clearfix">
+				<li class="active" id="introduce"><a href="{% url 'goods:detail' %}?id={{ sku.id }}">商品介绍</a></li>
+				<li id="spake"><a href="#">评论</a></li>
+			</ul>
+
+			<div class="tab_content" id="show_detail">
+				<dl>
+					<dt>商品详情：</dt>
+					<dd>{{ sku.goods.detail|safe}}</dd>
+				</dl>
+			</div>
+            <div class="tab_content" id="show_introduce">
+                <dl>
+                    <dt>商品评价：</dt>
+                </dl>
+                <ul class="show_commnet">
+                    {% for i in show_comment %}
+                        <li>{{ i.username }}:{{ i.comments }}<a href="#" class="show">评论</a></li>
+                    {% endfor %}
+                </ul>
+                <div>
+                    <a href="#" id="show_goods_comment">商品评论</a>
+                </div>
+                <div id="show">
+                    <form method="post" action="/goods/detail?id={{ sku.id }}">
+                        {% csrf_token %}
+                    <input type="text" name="write_comment"  class="write_comment">
+                    <input type="submit" name="" value="提交">
+                    </form>
+                </div>
+			</div>
+		</div>
+	</div>
+
+	<div class="footer">
+		<div class="foot_link">
+			<a href="#">关于我们</a>
+			<span>|</span>
+			<a href="#">联系我们</a>
+			<span>|</span>
+			<a href="#">招聘人才</a>
+			<span>|</span>
+			<a href="#">友情链接</a>
+		</div>
+		<p>CopyRight © 2016 北京天天生鲜信息技术有限公司 All Rights Reserved</p>
+		<p>电话：010-****888    京ICP备*******8号</p>
+	</div>
+	<div class="add_jump"></div>
+	<script type="text/javascript" src="{% static 'js/jquery-1.12.4.min.js' %}"></script>
+	<script type="text/javascript">
+		var $add_x = $('#add_cart').offset().top;
+		var $add_y = $('#add_cart').offset().left;
+
+		var $to_x = $('#show_count').offset().top;
+		var $to_y = $('#show_count').offset().left;
+		$(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
+		$('#add_cart').click(function(){
+		    sku_id = $(this).attr('sku_id')
+            count = $('.num_show').val()
+            csrf = $('input[name="csrfmiddlewaretoken"]').val()
+            params = {'sku_id':sku_id,'count':count,'csrfmiddlewaretoken':csrf}
+            $.post('/cart/add',params,function (data) {
+                if(data.res == 5){
+                    $(".add_jump").css({'left':$add_y+80,'top':$add_x+10,'display':'block'})
+                    $(".add_jump").stop().animate({
+                        'left': $to_y+7,
+				        'top': $to_x+7
+                    },
+                    'slow',function () {
+                            $(".add_jump").fadeOut('fast',function () {
+                                $('#show_count').html(data.total_count);
+                            });
+                        });
+                }
+                else {
+                    alert(data.errmsg)
+                }
+            })
+		})
+	</script>
+
+    <script>
+        $(function() {
+            $.get(
+                '{% url 'cart:show_cart_count' %}',
+                function (data) {
+                    $('#show_count').text(data.cart_count)
+                }
+            )
+            $("#add").click(function () {
+                plus()
+            })
+            $("#min").click(function () {
+                minus()
+            })
+
+            function plus() {
+                num = parseFloat($('.num_show').val());
+                $('.num_show').val(num+1);
+                $('.num_show').blur();
+            }
+            function minus() {
+                num = parseFloat($('.num_show').val());
+                if (num != 1){
+                    $('.num_show').val(num-1);
+                    $('.num_show').blur();
+                }
+                if (num <=1){
+                    $('.num_show').val(1)
+                    $('.num_show').blur();
+                }
+            }
+            $('.num_show').blur(function () {
+                    num = parseFloat($('.num_show').val());
+                    price = parseFloat($('#show_pirze').text());
+                    total = num*price;
+                    $('#gtotal').text(total.toFixed(2)+'元')
+                })
+            })
+            $('#show_introduce').css('display','none')
+            $('#spake').click(function () {
+                $('#spake').addClass('active')
+                $('#introduce').removeClass("active")
+                $('#show_detail').css('display','none')
+                $('#show_introduce').css('display','block')
+            })
+            $('#introduce').click(function () {
+                $('#introduce').addClass('active')
+                $('#spake').removeClass("active")
+                $('#show_introduce').css('display','none')
+                $('#show_detail').css('display','block')
+            })
+            $('.show').click(function () {
+                $('#show').css('display','block')
+            })
+            $('#show_goods_comment').click(function () {
+                $('#show').css('display','block')
+            })
+
+    </script>
+</body>
+</html>
